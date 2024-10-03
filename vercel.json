@@ -2,12 +2,14 @@
     "version": 2,
     "builds": [
       {
-        "src": "package.json",
+        "src": "dist/server.js",
         "use": "@vercel/node"
       }
     ],
-    "scripts": {
-      "build": "npm run build && npm run keys && npm run serve"
-    }
-  }
-  
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/dist/server.js"
+      }
+    ]
+}
