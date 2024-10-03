@@ -1,0 +1,37 @@
+name: Generate keys
+on:
+  workflow_dispatch:
+jobs:
+  installDependencies:
+    name: Generate keys
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        uses: actions/setup-node@v2
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+        with:
+          args: install
+      - name: npm ci and npm run keys
+        run: |
+          npm ci
+          npm run keys 
+        env:
+          CI: true
+      - name: checking status
+        run: git status
+      - name: setting identity
+        run: |
+          git config --global user.email "rovelli.gianmarai@gmail.com"
+          git config --global user.name "Gianmaria Rovelli"
+      - name: stage keys file
+        run: git add src/keys.json
+      - name: commit keys
+        run: git commit -am "Updating keys.json" || true
+      - name: switching from HTTPS to SSH
+        run: git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      - name: push code to main
+        run: git push origin main || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
